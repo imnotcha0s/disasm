@@ -1,0 +1,12 @@
+name = "disasm"
+license = "MIT"
+licenselink = "https://github.com/example/disasm/blob/main/LICENSE"
+description = "A Hugo theme styled as IDA Pro running on Windows XP. The blog has been loaded into a disassembler."
+homepage = "https://github.com/example/disasm"
+demosite = ""
+tags = ["retro", "windows xp", "monospace", "blog", "no-js"]
+features = ["blog", "syntax highlighting", "search", "tags", "accessible", "responsive"]
+min_version = "0.134.0"
+
+[author]
+  name = "disasm contributors"

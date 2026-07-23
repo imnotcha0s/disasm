@@ -1,0 +1,19 @@
+{{- /* Graph overview: a real minimap of the post — the thumbnail is decorative,
+       the list below it is the actual table of contents. */ -}}
+<svg class="graph__thumb" viewBox="0 0 200 96" role="img" aria-hidden="true" focusable="false">
+  <rect width="200" height="96" fill="var(--content-bg)"/>
+  <g stroke="var(--code-comment)" fill="var(--face)">
+    <rect x="78" y="6"   width="44" height="14"/>
+    <rect x="34" y="38"  width="44" height="14"/>
+    <rect x="122" y="38" width="44" height="14"/>
+    <rect x="78" y="72"  width="44" height="14"/>
+  </g>
+  <g stroke="var(--code-label)" fill="none">
+    <path d="M100 20v8H56v10M100 20v8h44v10M56 52v12h44v8M144 52v12h-44"/>
+  </g>
+</svg>
+{{ with .TableOfContents }}
+  <nav class="toc" aria-label="Table of contents">{{ . }}</nav>
+{{ else }}
+  <p class="toc">; no sub-functions in this chunk</p>
+{{ end }}

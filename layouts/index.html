@@ -1,0 +1,40 @@
+{{ define "mdi-class" }}mdi--home{{ end }}
+{{ define "main" }}
+  {{ $posts := where site.RegularPages "Type" "posts" }}
+  {{ $latest := false }}
+  {{ with $posts }}{{ $latest = index (sort . "Date" "desc") 0 }}{{ end }}
+  {{ $recent := first 8 (sort $posts "Date" "desc") }}
+
+  {{- /* 1. Intro + latest post, in the IDA View-A window */ -}}
+  {{ $intro := "" }}
+  {{ if .Content }}
+    {{ $intro = printf `<div class="view"><div class="disasm"><h1>%s</h1>%s%s</div></div>`
+        site.Title .Content (partial "latest-teaser.html" $latest) }}
+  {{ else }}
+    {{ $intro = printf `<div class="view"><div class="disasm"><h1>%s</h1><p>%s</p>%s</div></div>`
+        site.Title (site.Params.description | default "") (partial "latest-teaser.html" $latest) }}
+  {{ end }}
+
+  {{ partial "window.html" (dict
+      "caption" "IDA View-A    .text:00401000"
+      "class" "win--view"
+      "label" "Introduction"
+      "buttons" true
+      "body" ($intro | safeHTML)) }}
+
+  {{- /* 2. Names window — recent posts */ -}}
+  {{ partial "window.html" (dict
+      "caption" "Names window"
+      "class" "win--names"
+      "label" "Recent posts"
+      "buttons" true
+      "body" (partial "names-window.html" (dict "pages" $recent "caption" "Recent functions"))) }}
+
+  {{- /* 3. Strings window — tags */ -}}
+  {{ partial "window.html" (dict
+      "caption" "Strings window"
+      "class" "win--strings"
+      "label" "Tags"
+      "buttons" true
+      "body" (partial "strings-window.html" (dict "plural" "tags" "caption" "Tag strings"))) }}
+{{ end }}

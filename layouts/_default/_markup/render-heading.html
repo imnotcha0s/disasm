@@ -1,0 +1,14 @@
+{{- /* Headings render as IDA labels: a decorative `sub_401A2F:` line above the
+       real heading text, plus a deterministic gutter address. The heading text
+       itself is untouched, so the TOC and screen readers are unaffected. */ -}}
+{{- $base := partial "func/address.html" .Page -}}
+{{- $seg := .Page.Params.segment | default ".text" -}}
+{{- $o := 0 -}}{{- with .Ordinal }}{{ $o = . }}{{ end -}}
+{{- $addr := add $base (mul (add $o 1) 76) -}}
+{{- $hex := printf "%08X" $addr -}}
+<h{{ .Level }} id="{{ .Anchor }}"
+    data-addr="{{ $seg }}:{{ $hex }}"
+    data-arrow="{{ cond (eq .Level 2) "┌─" "├─" }}">
+  {{- if le .Level 3 }}<span class="label-glyph" aria-hidden="true">sub_{{ substr $hex 2 }}:</span>{{ end -}}
+  {{ .Text }}
+</h{{ .Level }}>

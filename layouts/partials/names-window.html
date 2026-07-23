@@ -1,0 +1,33 @@
+{{- /*
+  Names window body: a real table of posts, optionally grouped into category
+  "segments". Call with dict (pages, caption).
+
+  Groups are <tbody> elements introduced by a `scope="colgroup"` header row
+  rather than <section>s, so that every group shares one set of aligned
+  columns while still announcing the group name to assistive tech.
+*/ -}}
+{{- $groups := partial "func/groups.html" (dict "pages" .pages) -}}
+<table class="listview">
+  {{ with .caption }}<caption>{{ . }}</caption>{{ end }}
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Address</th>
+      <th scope="col">Type</th>
+    </tr>
+  </thead>
+  {{ range $groups }}
+    <tbody>
+      {{ with .label }}
+        <tr>
+          <th colspan="3" scope="colgroup" class="segment-divider">
+            <span aria-hidden="true">; ─── Segment: </span>{{ . }}
+          </th>
+        </tr>
+      {{ end }}
+      {{ range .pages }}
+        {{ partial "post-row.html" . }}
+      {{ end }}
+    </tbody>
+  {{ end }}
+</table>

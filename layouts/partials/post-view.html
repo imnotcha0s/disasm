@@ -1,0 +1,32 @@
+{{- /* The IDA View-A pane: comment header, gutter-wrapped body, post nav. */ -}}
+{{- $seg := .Params.segment | default ".text" -}}
+{{- $base := partial "func/address.html" . -}}
+{{- $addr := printf "%s:%08X" $seg $base -}}
+{{- $size := printf "%08X" (mul (add .WordCount 1) 7) -}}
+<article class="view">
+  <p class="chunk-header">; ─────────────── S U B R O U T I N E ───────────────
+; FUNCTION CHUNK AT <span class="seg">{{ $addr }}</span> SIZE {{ $size }} BYTES
+{{- with site.Params.author }}
+; Author: {{ . }}{{ end }}
+; Date:   <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+{{- with .Params.tags }}
+; Tags:   <span class="tags">{{ range . }}<a href="{{ partial "func/url.html" (printf "/tags/%s/" (urlize .)) }}">{{ . }}</a>{{ end }}</span>{{ end }}
+</p>
+
+  {{ with .TableOfContents }}
+    <details class="toc-mobile">
+      <summary>Functions in this chunk</summary>
+      <div class="toc">{{ . }}</div>
+    </details>
+  {{ end }}
+
+  <div class="disasm" data-segment="{{ $seg }}" data-address="{{ printf "0x%08X" $base }}">
+    <h1 data-addr="{{ $addr }}" data-arrow="┌─">{{ .Title }}</h1>
+    {{ .Content }}
+  </div>
+
+  <nav class="post-nav" aria-label="More posts">
+    {{ with .PrevInSection }}<a href="{{ .RelPermalink }}" rel="prev">← {{ .Title }}</a>{{ else }}<span></span>{{ end }}
+    {{ with .NextInSection }}<a href="{{ .RelPermalink }}" rel="next">{{ .Title }} →</a>{{ end }}
+  </nav>
+</article>

@@ -1,0 +1,523 @@
+/* disasm — MDI child windows, list views, dialogs */
+
+/* The MDI region fills whatever the chrome leaves. On desktop the child
+   windows fill it in turn and scroll their own bodies, so every title bar
+   stays put — real MDI behaviour. On mobile the windows keep their natural
+   height and this region scrolls instead, which is far better on touch. */
+.mdi {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 8px 6px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+  align-content: start;
+}
+
+
+.mdi--home {
+  grid-template-columns: 1fr;
+}
+
+/* Modal-style pages (404) sit on the bare desktop, centred, not stretched. */
+.mdi--dialog {
+  background: var(--desk);
+  grid-auto-rows: auto;
+  overflow-y: auto;
+  /* Centre the dialog rather than stretching it to the grid area. */
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+}
+
+.mdi--dialog > .dialog { margin: 0; }
+
+@media (min-width: 900px) {
+  .mdi--home {
+    grid-template-columns: minmax(0, 1.9fr) minmax(320px, 1fr);
+    grid-template-areas:
+      "view  names"
+      "view  strings";
+  }
+  .mdi--home > .win--view    { grid-area: view; }
+  .mdi--home > .win--names   { grid-area: names; }
+  .mdi--home > .win--strings { grid-area: strings; }
+
+  .mdi--post {
+    grid-template-columns: minmax(0, 1fr) 232px;
+    grid-template-areas: "view graph";
+  }
+  .mdi--post > .win--view  { grid-area: view; min-width: 0; }
+  .mdi--post > .win--graph { grid-area: graph; }
+  .mdi--post.is-maximized { grid-template-columns: minmax(0, 1fr); grid-template-areas: "view"; }
+  .mdi--post.is-maximized > .win--graph { display: none; }
+}
+
+/* ------------------------------------------------------------------ *
+ * MDI child window                                                    *
+ * ------------------------------------------------------------------ */
+
+.win {
+  background: var(--face);
+  border: 1px solid var(--face-dk);
+  border-radius: 4px 4px 2px 2px;
+  padding: 2px;
+  min-width: 0;
+}
+
+.win__body {
+  background: var(--content-bg);
+  margin-top: 2px;
+  /* Mobile default: content flows and .mdi scrolls. Desktop overrides this
+     to `auto` so each window scrolls inside its own frame. */
+  overflow: visible;
+  /* Lets list views adapt to the window they sit in, not the viewport —
+     the Names window is a narrow sidebar on the home page and full width
+     on /posts/. Ignored by browsers without container queries. */
+  container-type: inline-size;
+}
+
+.win__body--face { background: var(--face); padding: 6px; }
+
+/* The output window keeps its own fixed-height scroll. */
+.console .win__body { overflow-y: auto; }
+
+.win.is-collapsed .win__body { display: none; }
+
+/* Desktop: windows fill the MDI region and scroll their own bodies, so the
+   title bars never leave the screen. Declared after the base rules above so
+   the overflow override actually wins the cascade. */
+@media (min-width: 721px) {
+  .mdi {
+    overflow: hidden;
+    align-content: stretch;
+    grid-auto-rows: minmax(0, 1fr);
+  }
+
+  .win {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .win__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .win.is-collapsed { flex: 0 0 auto; }
+}
+
+/* Optional dragging (desktop only, JS) */
+.win.is-dragging { opacity: .92; }
+.win[data-draggable="true"] .titlebar { cursor: move; }
+
+/* ------------------------------------------------------------------ *
+ * List views (Names / Strings / Functions windows)                    *
+ * ------------------------------------------------------------------ */
+
+.listview {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--content-bg);
+}
+
+.listview caption {
+  text-align: left;
+  padding: 3px 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--face);
+}
+
+.listview th {
+  position: sticky;
+  top: 0;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: normal;
+  padding: 3px 6px;
+  background: var(--face);
+  border-right: 1px solid var(--face-sh);
+  border-bottom: 1px solid var(--face-sh);
+  box-shadow: inset 1px 1px 0 var(--face-hi);
+  white-space: nowrap;
+}
+
+.listview td {
+  padding: 2px 6px;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.listview tbody tr:hover { background: #eef3fb; }
+.listview tbody tr:focus-within { background: #dce9fb; }
+
+.listview { table-layout: fixed; }
+.listview .cell--name { width: 56%; overflow-wrap: anywhere; }
+.listview .cell--addr { width: 28%; }
+.listview .cell--type { width: 16%; overflow: hidden; text-overflow: ellipsis; }
+.listview .cell--addr { color: var(--code-addr); white-space: nowrap; }
+.listview .cell--type { color: var(--code-comment); white-space: nowrap; }
+.listview .cell--len  { color: var(--code-addr); text-align: right; white-space: nowrap; }
+
+.listview a {
+  color: var(--code-label);
+  text-decoration: none;
+}
+.listview a:hover { text-decoration: underline; }
+.listview a:visited { color: var(--link-visited); }
+
+.listview .row-summary {
+  display: block;
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+/* Strings window: Address / Length / Type are fixed-width — they hold at most
+   a dozen characters — so the String column gets everything that is left.
+   Even columns would be wasted space. */
+/* px, not ch: with table-layout: fixed the column width is taken from the
+   header cell, which is 11px UI type, while the data cell is 12px mono — a
+   ch-based width comes out too narrow and the address spills into String. */
+.listview--strings th:nth-child(1),
+.listview--strings td:nth-child(1) { width: 132px; }
+.listview--strings th:nth-child(2),
+.listview--strings td:nth-child(2) { width: 62px; }
+.listview--strings th:nth-child(3),
+.listview--strings td:nth-child(3) { width: 68px; }
+.listview--strings th:nth-child(4),
+.listview--strings td:nth-child(4) { width: auto; }
+
+@container (max-width: 420px) {
+  .listview--strings th:nth-child(2),
+  .listview--strings td:nth-child(2),
+  .listview--strings th:nth-child(3),
+  .listview--strings td:nth-child(3) { display: none; }
+}
+
+/* A Names window docked in a narrow column drops the Type column and the
+   summary line rather than wrapping the title to one word per line. */
+@container (max-width: 460px) {
+  .listview .cell--name { width: 66%; }
+  .listview .cell--addr { width: 34%; }
+  .listview .cell--type,
+  .listview thead th:nth-child(3) { display: none; }
+  .listview .row-summary { display: none; }
+}
+
+/* Segment dividers — category groups in the Names window */
+.segment-group { border: 0; margin: 0; }
+
+.segment-divider {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--code-comment);
+  background: var(--face);
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--face-sh);
+  border-top: 1px solid var(--face-hi);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.listview th.segment-divider {
+  position: static;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--code-comment);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Trailing rule, drawn as dashes to match IDA's segment banners. */
+.listview th.segment-divider::after {
+  content: " ────────────────────────────────────────────────────────────";
+}
+
+/* Pagination — XP nav buttons */
+.pager {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 6px;
+  background: var(--face);
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+
+.btn,
+.pager a,
+.pager span {
+  display: inline-block;
+  min-width: 24px;
+  padding: 3px 9px;
+  text-align: center;
+  background: var(--face);
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--face-dk);
+  border-radius: 3px;
+  box-shadow: inset 1px 1px 0 var(--face-hi), inset -1px -1px 0 var(--face-sh);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+.btn:hover, .pager a:hover { background: var(--face-lt); }
+.btn:active, .pager a:active { box-shadow: inset 1px 1px 0 var(--face-sh); }
+.pager [aria-current="page"] { font-weight: bold; box-shadow: inset 1px 1px 0 var(--face-sh); }
+.pager .is-disabled { color: var(--face-sh); box-shadow: none; cursor: default; }
+
+/* ------------------------------------------------------------------ *
+ * Graph overview / TOC mini-window                                    *
+ * ------------------------------------------------------------------ */
+
+.graph__thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--content-bg);
+  border-bottom: 1px solid var(--rule);
+}
+
+.toc { padding: 4px 6px; font-family: var(--font-mono); font-size: 12px; }
+.toc ul, .toc ol { list-style: none; margin: 0; padding: 0; }
+.toc ul ul, .toc ol ol { padding-left: 12px; }
+.toc li { margin: 1px 0; }
+.toc a { color: var(--code-label); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.toc a::before { content: "├─ "; color: var(--code-comment); }
+
+.toc-mobile { display: none; }
+
+@media (max-width: 899px) {
+  .win--graph { display: none; }
+  .toc-mobile {
+    display: block;
+    margin: 0 0 10px;
+    background: var(--face);
+    padding: 4px 6px;
+  }
+  .toc-mobile summary { cursor: pointer; font-family: var(--font-ui); font-size: 11px; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Dialogs — 404, search ("Jump to address"), loading screen           *
+ * ------------------------------------------------------------------ */
+
+.dialog {
+  width: min(460px, calc(100vw - 24px));
+  margin: 8vh auto;
+  background: var(--face);
+  border: 1px solid var(--face-dk);
+  border-radius: 6px 6px 2px 2px;
+  padding: 2px;
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, .35);
+}
+
+.dialog__body {
+  padding: 14px 14px 10px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dialog__glyph { flex: 0 0 32px; width: 32px; height: 32px; }
+
+/* About popup — IDA's About box: logo panel, product line, prose.
+   The dialog is capped to the region it sits in so the title bar and the OK
+   button are always reachable; the prose scrolls, not the dialog. */
+.dialog--about {
+  width: min(620px, calc(100vw - 24px));
+  max-height: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog__body--about {
+  /* stretch, not flex-start: the text column has to receive the row height
+     before its prose box can shrink and scroll inside it. */
+  align-items: stretch;
+  gap: 16px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dialog--about .dialog__actions { flex: 0 0 auto; }
+
+.about__logo { flex: 0 0 64px; }
+.about__logo svg { width: 64px; height: 64px; display: block; }
+
+.about__text {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.about__text h1 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-family: var(--font-ui);
+}
+.about__version {
+  margin: 0 0 10px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.about__version code { font-family: var(--font-mono); }
+
+/* The prose keeps the monospace body voice, and scrolls if it outgrows the
+   dialog rather than pushing the OK button off the desktop. */
+.about__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 10px;
+  background: var(--content-bg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  box-shadow:
+    inset  1px  1px 0 var(--face-dk),
+    inset -1px -1px 0 var(--face-hi),
+    inset  2px  2px 0 var(--face-sh),
+    inset -2px -2px 0 var(--face-lt);
+}
+.about__content > :first-child { margin-top: 0; }
+.about__content > :last-child { margin-bottom: 0; }
+.about__content p { margin: 0 0 1em; }
+.about__content h2 {
+  font-size: 1em;
+  color: var(--code-label);
+  margin: 1.4em 0 .4em;
+}
+.about__content a { color: var(--link); }
+.about__content code {
+  font-size: .92em;
+  background: #f4f2ea;
+  padding: 0 .3ch;
+}
+.dialog__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 6px 10px 12px;
+}
+.dialog__actions .btn { min-width: 76px; padding: 4px 12px; }
+
+/* Search dialog */
+.search-dialog[hidden] { display: none; }
+.search-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, .28);
+  overflow-y: auto;
+}
+.search-dialog .dialog { margin-top: 12vh; width: min(560px, calc(100vw - 24px)); }
+
+.search-form { display: flex; gap: 6px; padding: 12px 12px 6px; }
+.search-form label { align-self: center; white-space: nowrap; font-size: 11px; }
+
+.field {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 3px 5px;
+  background: var(--content-bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border: 1px solid var(--face-sh);
+  box-shadow: inset 1px 1px 0 var(--face-dk);
+}
+
+.search-results {
+  margin: 0 12px 12px;
+  max-height: 46vh;
+  overflow-y: auto;
+  background: var(--content-bg);
+  border: 1px solid var(--face-sh);
+  box-shadow: inset 1px 1px 0 var(--face-dk);
+}
+.search-results:empty::after {
+  content: "No addresses matched.";
+  display: block;
+  padding: 6px;
+  color: var(--code-comment);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* Loading screen (JS-created; never present without JS) */
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--desk);
+}
+.loading--boot { background: var(--boot-bg); color: #dfe8f5; flex-direction: column; gap: 22px; }
+.loading__wordmark {
+  font-family: var(--font-ui);
+  font-size: 26px;
+  letter-spacing: .04em;
+  color: #dfe8f5;
+}
+.loading__hint { font-size: 11px; color: var(--ink-soft); padding: 0 12px 10px; }
+.loading--boot .loading__hint { color: #8ea3bd; }
+
+.progress {
+  height: 16px;
+  margin: 4px 12px 8px;
+  padding: 2px;
+  background: var(--content-bg);
+  border: 1px solid var(--face-sh);
+  box-shadow: inset 1px 1px 0 var(--face-dk);
+  overflow: hidden;
+}
+.progress__fill {
+  height: 100%;
+  width: 0;
+  background:
+    repeating-linear-gradient(to right,
+      var(--sel-bg) 0 9px, transparent 9px 12px);
+  transition: width .18s linear;
+}
+.loading--boot .progress { width: 220px; margin: 0; background: #0b1220; border-color: #24405f; }
+
+.loading__log {
+  margin: 0 12px 10px;
+  height: 74px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--console-text);
+  background: var(--console-bg);
+  padding: 3px 6px;
+  box-shadow: inset 1px 1px 0 var(--face-dk);
+}
+.loading__log p { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__fill { transition: none; }
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}

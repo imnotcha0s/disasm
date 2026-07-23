@@ -1,0 +1,5 @@
+{{- /* Goldmark wraps images in a <p>, so no <figure> here — an inline caption
+       keeps the markup valid. */ -}}
+<img src="{{ .Destination | safeURL }}" alt="{{ .Text }}"
+     {{ with .Title }}title="{{ . }}"{{ end }} loading="lazy" decoding="async">
+{{- with .Title }}<span class="figcaption">{{ . }}</span>{{ end -}}

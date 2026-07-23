@@ -1,0 +1,21 @@
+{{ define "mdi-class" }}mdi--post{{ end }}
+{{ define "main" }}
+  {{ $seg := .Params.segment | default ".text" }}
+  {{ $base := partial "func/address.html" . }}
+
+  {{ partial "window.html" (dict
+      "caption" (printf "IDA View-A    %s:%08X" $seg $base)
+      "class" "win--view"
+      "label" .Title
+      "buttons" true
+      "draggable" false
+      "body" (partial "post-view.html" .)) }}
+
+  {{ $graph := partial "graph-window-body.html" . }}
+  {{ partial "window.html" (dict
+      "caption" "Graph overview"
+      "class" "win--graph"
+      "label" "Contents"
+      "face" true
+      "body" $graph) }}
+{{ end }}

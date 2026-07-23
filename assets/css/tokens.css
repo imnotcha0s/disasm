@@ -1,0 +1,104 @@
+/* disasm — design tokens (§4) */
+
+:root {
+  /* Desktop / page background */
+  --desk:            #3a6ea5;
+
+  /* Window control surfaces (Luna beige-grey) */
+  --face:            #ece9d8;
+  --face-lt:         #f5f3ea;   /* bevel inner highlight */
+  --face-hi:         #ffffff;   /* bevel highlight (top-left) */
+  --face-sh:         #aca899;   /* bevel shadow (bottom-right) */
+  --face-dk:         #716f64;   /* deep shadow / 1px frame */
+
+  /* Active title bar (Luna blue gradient).
+     Deepened from the reference screenshot so white caption text clears
+     WCAG AA (4.5:1) at every stop of the gradient. */
+  --title-1:         #0a4fbf;
+  --title-2:         #1f6ed0;
+  --title-3:         #124d9e;
+  --title-text:      #ffffff;
+
+  /* Inactive title bar */
+  --title-off-1:     #5c7ec0;
+  --title-off-2:     #7e9ad0;
+  --title-off-text:  #ffffff;
+
+  /* Window frame */
+  --frame:           #0831d9;
+
+  /* Selection */
+  --sel-bg:          #316ac5;
+  --sel-text:        #ffffff;
+
+  /* Content / list-view surfaces */
+  --content-bg:      #ffffff;
+  --ink:             #1a1a1a;
+  --ink-soft:        #4a4a4a;
+  --rule:            #d4d0c8;
+
+  /* Disassembly / code syntax */
+  --code-label:      #0000c0;
+  --code-mnemonic:   #000080;
+  --code-string:     #007000;
+  --code-comment:    #6b6b6b;
+  --code-addr:       #800000;
+  --code-reg:        #a52a2a;
+
+  /* Console / output window */
+  --console-bg:      #fbfbf6;
+  --console-text:    #2f4f1f;
+  --console-accent:  #316500;
+
+  /* Links */
+  --link:            #0000ee;
+  --link-visited:    #551a8b;
+
+  /* Boot / loading overlay */
+  --boot-bg:         #000814;
+
+  /* Fonts */
+  --font-ui:   Tahoma, "Segoe UI", Verdana, Geneva, sans-serif;
+  --font-mono: "Lucida Console", Consolas, "DejaVu Sans Mono", "Courier New", monospace;
+
+  /* Metrics */
+  --titlebar-h: 28px;
+  --menubar-h:  22px;
+  --radius-win: 8px 8px 0 0;
+  --bevel: 1px;
+  --gutter-w: 18ch;
+}
+
+/* Opt-in bitmap-ish retro face (params.retroFont). Never blocks render. */
+html.retro-font {
+  --font-ui: "W95FA", "MS Sans Serif", Tahoma, Verdana, sans-serif;
+}
+
+/* Optional "debugger" dark variant — opt-in only, never via prefers-color-scheme. */
+html[data-theme="debugger"] {
+  --desk:        #101418;
+  --face:        #2b2f36;
+  --face-lt:     #3a3f47;
+  --face-hi:     #4d535c;
+  --face-sh:     #1b1e23;
+  --face-dk:     #0d0f12;
+  --title-1:     #123a63;
+  --title-2:     #2f6ea8;
+  --title-3:     #0f2f52;
+  --frame:       #123a63;
+  --content-bg:  #14181d;
+  --ink:         #d6ffd6;
+  --ink-soft:    #9fc39f;
+  --rule:        #33393f;
+  --code-label:  #7aa2ff;
+  --code-mnemonic: #9fc0ff;
+  --code-string: #7fdb7f;
+  --code-comment:#8b9299;
+  --code-addr:   #e2a06a;
+  --code-reg:    #e08a8a;
+  --console-bg:  #0e1114;
+  --console-text:#8fd45a;
+  --link:        #8ab4ff;
+  --link-visited:#c3a0ff;
+  --sel-bg:      #2f6ea8;
+}

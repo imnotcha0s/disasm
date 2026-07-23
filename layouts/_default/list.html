@@ -1,0 +1,23 @@
+{{ define "main" }}
+  {{ $pages := .Paginate .Pages }}
+
+  {{ if .Content }}
+    {{ partial "window.html" (dict
+        "caption" (printf "IDA View-A    %s" .Title)
+        "class" "win--view"
+        "label" .Title
+        "body" (printf `<div class="view"><div class="disasm"><h1>%s</h1>%s</div></div>` .Title .Content | safeHTML)) }}
+  {{ end }}
+
+  {{ $body := partial "names-window.html" (dict
+      "pages" $pages.Pages
+      "caption" (printf "%d of %d functions" (len $pages.Pages) (len .Pages))) }}
+  {{ $body = printf "%s%s" $body (partial "pagination.html" .) }}
+
+  {{ partial "window.html" (dict
+      "caption" (printf "Names window    %s" .RelPermalink)
+      "class" "win--names"
+      "label" (printf "%s — list of posts" .Title)
+      "buttons" true
+      "body" ($body | safeHTML)) }}
+{{ end }}

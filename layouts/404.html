@@ -1,0 +1,23 @@
+{{ define "mdi-class" }}mdi--dialog{{ end }}
+{{ define "main" }}
+<div class="dialog" role="alertdialog" aria-labelledby="err-title" aria-describedby="err-body">
+  {{ partial "titlebar.html" (dict "caption" "Error" "small" true) }}
+  <div class="dialog__body">
+    <svg class="dialog__glyph" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <circle cx="16" cy="16" r="14" fill="#c0392b"/>
+      <path d="M10 10 22 22M22 10 10 22" stroke="#fff" stroke-width="4"/>
+    </svg>
+    <div>
+      <h1 id="err-title" style="font-size:13px;margin:0 0 6px">Address not found</h1>
+      <p id="err-body" style="margin:0">
+        The address <code>0x????????</code> could not be resolved to a known segment.
+        Check the link, or jump back to the database entry point.
+      </p>
+    </div>
+  </div>
+  <div class="dialog__actions">
+    <a class="btn" href="{{ partial "func/url.html" "/" }}">OK</a>
+    <a class="btn" href="{{ partial "func/url.html" "/search/" }}" data-search-open>Jump to…</a>
+  </div>
+</div>
+{{ end }}

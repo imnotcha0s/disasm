@@ -1,0 +1,17 @@
+{{- /* Status bar = footer/meta. Real information, XP dressing. */ -}}
+<footer class="statusbar">
+  <span class="statusbar__cell bevel-thin-in" aria-hidden="true">AU: idle</span>
+  {{ if .IsPage }}
+    <span class="statusbar__cell bevel-thin-in">{{ .WordCount }} words</span>
+    <span class="statusbar__cell bevel-thin-in">{{ .ReadingTime }} min read</span>
+  {{ else }}
+    <span class="statusbar__cell bevel-thin-in">{{ len (where site.RegularPages "Type" "posts") }} functions</span>
+  {{ end }}
+  <span class="statusbar__cell statusbar__cell--grow bevel-thin-in">
+    &copy; {{ now.Year }} {{ site.Params.author | default site.Title }}
+  </span>
+  <span class="statusbar__cell bevel-thin-in statusbar__cell--optional" aria-hidden="true">Down</span>
+  <span class="statusbar__cell bevel-thin-in statusbar__cell--optional" aria-hidden="true">
+    Disk: {{ site.Params.diskGag | default "19GB" }}
+  </span>
+</footer>

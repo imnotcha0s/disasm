@@ -1,0 +1,275 @@
+/* disasm — post content, the disassembly gutter, prose elements */
+
+.view {
+  background: var(--content-bg);
+  padding: 10px 12px 26px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+@media (min-width: 1000px) {
+  .view { font-size: 16px; }
+}
+
+/* Header block, rendered as IDA comments */
+.chunk-header {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--code-comment);
+  margin: 0 0 14px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--rule);
+  white-space: pre-wrap;
+}
+.chunk-header a { color: var(--code-comment); }
+.chunk-header .seg { color: var(--code-addr); }
+
+/* ------------------------------------------------------------------ *
+ * THE SIGNATURE: the disassembly gutter                               *
+ *                                                                     *
+ * Every block-level child of .disasm gets a left margin column        *
+ * carrying a fake segment address and a jump-arrow glyph. Addresses    *
+ * on headings are rendered server-side (deterministic per post);       *
+ * gutter.js fills in the remaining blocks. With JS off the column      *
+ * still renders with tick marks — decoration only, never content.      *
+ * ------------------------------------------------------------------ */
+
+.disasm {
+  --gutter-line: color-mix(in srgb, var(--rule) 70%, transparent);
+  position: relative;
+  max-width: calc(72ch + var(--gutter-w));
+}
+
+.disasm::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--gutter-w) - 2.2ch);
+  border-right: 1px solid var(--gutter-line);
+  pointer-events: none;
+}
+
+.disasm > * {
+  position: relative;
+  padding-left: var(--gutter-w);
+}
+
+.disasm > *::before {
+  content: "\00b7";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--gutter-w) - 3ch);
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: inherit;
+  color: var(--code-addr);
+  opacity: .72;
+  white-space: pre;
+  user-select: none;
+  pointer-events: none;
+}
+
+.disasm > [data-addr]::before { content: attr(data-addr); }
+
+/* Jump arrows — drawn in the sliver between address and text */
+.disasm > [data-arrow]::after {
+  content: attr(data-arrow);
+  position: absolute;
+  left: calc(var(--gutter-w) - 2.4ch);
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: inherit;
+  color: var(--code-label);
+  opacity: .8;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Prose                                                               *
+ * ------------------------------------------------------------------ */
+
+.view p { margin: 0 0 1.1em; }
+
+.view h1, .view h2, .view h3, .view h4, .view h5, .view h6 {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: var(--code-label);
+  line-height: 1.3;
+  margin: 1.9em 0 .7em;
+}
+.view > .disasm > h1:first-child,
+.view > .disasm > h2:first-child { margin-top: .2em; }
+
+.view h1 { font-size: 1.5em; }
+.view h2 { font-size: 1.28em; }
+.view h3 { font-size: 1.12em; }
+.view h4, .view h5, .view h6 { font-size: 1em; }
+
+/* Headings read as IDA labels: sub_401A2F: */
+.disasm > h2::after,
+.disasm > h3::after { display: none; }
+
+.label-glyph {
+  display: block;
+  font-weight: normal;
+  font-size: .82em;
+  color: var(--code-label);
+  opacity: .85;
+  letter-spacing: .02em;
+}
+
+.view a { color: var(--link); }
+.view a:visited { color: var(--link-visited); }
+
+.view ul, .view ol { margin: 0 0 1.1em; padding-left: 2.2ch; }
+.disasm > ul, .disasm > ol { padding-left: calc(var(--gutter-w) + 2.4ch); }
+.view li { margin: .25em 0; }
+.view li::marker { color: var(--code-addr); }
+
+.view blockquote {
+  margin: 0 0 1.1em;
+  border-left: 3px solid var(--code-comment);
+  color: var(--ink-soft);
+}
+.disasm > blockquote { padding-left: calc(var(--gutter-w) + 1.4ch); border-left: none; }
+.disasm > blockquote > p { position: relative; }
+.disasm > blockquote { border-left: 0; }
+.view blockquote p:last-child { margin-bottom: 0; }
+
+.view hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 1.8em 0;
+}
+
+.view img,
+.view video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  background: var(--content-bg);
+  padding: 3px;
+  box-shadow:
+    inset  1px  1px 0 var(--face-dk),
+    inset -1px -1px 0 var(--face-hi),
+    inset  2px  2px 0 var(--face-sh),
+    inset -2px -2px 0 var(--face-lt);
+}
+
+.view figure { margin: 0 0 1.2em; }
+.view .figcaption {
+  display: block;
+  font-size: .82em;
+  color: var(--code-comment);
+  margin-top: .4em;
+}
+
+.view figcaption {
+  font-size: .82em;
+  color: var(--code-comment);
+  margin-top: .4em;
+}
+
+.view code {
+  font-family: var(--font-mono);
+  font-size: .92em;
+  background: #f4f2ea;
+  padding: 0 .3ch;
+}
+[data-theme="debugger"] .view code { background: #1e242b; }
+
+.table-scroll { margin: 0 0 1.2em; }
+.table-scroll__inner { overflow-x: auto; }
+
+/* Blocks that paint a box (code, tables) must be *offset* by the gutter
+   rather than padded by it — padding keeps the border box full width, which
+   made the code block start under the address column and run to the very
+   edge of the window. The right margin gives it the same breathing room the
+   prose has. */
+.disasm > .table-scroll {
+  padding-left: 0;
+  margin-left: var(--gutter-w);
+  margin-right: 2ch;
+}
+
+.disasm > .table-scroll::before {
+  left: calc(-1 * var(--gutter-w));
+}
+
+.view table {
+  border-collapse: collapse;
+  font-size: .88em;
+  min-width: 100%;
+}
+.view th, .view td {
+  border: 1px solid var(--rule);
+  padding: 3px 8px;
+  text-align: left;
+}
+.view th { background: var(--face); font-weight: bold; }
+
+.view :target { background: #fdf6c8; }
+
+/* Footnotes, kbd, small */
+.view .footnotes { font-size: .88em; color: var(--ink-soft); }
+.view kbd {
+  font-family: var(--font-ui);
+  font-size: .85em;
+  padding: 0 4px;
+  background: var(--face);
+  border: 1px solid var(--face-dk);
+  border-radius: 2px;
+}
+
+/* Post navigation (prev / next function) */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.post-nav a { color: var(--code-label); }
+
+/* Tag chips */
+.tags { display: flex; gap: 5px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; }
+.tags a {
+  color: var(--code-string);
+  text-decoration: none;
+  padding: 1px 5px;
+  background: var(--face);
+  border: 1px solid var(--face-sh);
+}
+.tags a:hover { background: var(--sel-bg); color: var(--sel-text); }
+
+/* ------------------------------------------------------------------ *
+ * Mobile: keep the addresses, drop the arrows, narrow the column      *
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 720px) {
+  .view { font-size: 15px; padding: 8px 8px 20px; }
+  .disasm { --gutter-w: 0ch; max-width: none; }
+  .disasm::before { display: none; }
+  .disasm > *::before {
+    position: static;
+    display: block;
+    width: auto;
+    font-size: 10px;
+    opacity: .55;
+    margin-bottom: 1px;
+  }
+  .disasm > *:not([data-addr])::before { display: none; }
+  .disasm > [data-arrow]::after { display: none; }
+  .disasm > ul, .disasm > ol { padding-left: 2.4ch; }
+  .disasm > blockquote { padding-left: 1.4ch; border-left: 3px solid var(--code-comment); }
+}

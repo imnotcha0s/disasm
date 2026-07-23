@@ -1,0 +1,12 @@
+{{- /* Underlines the first occurrence of the accelerator letter, XP style.
+       Usage: {{ partial "accel.html" (dict "label" "File" "accel" "F") }} */ -}}
+{{- $label := .label -}}
+{{- $accel := .accel | default "" -}}
+{{- if and $accel (in $label $accel) -}}
+  {{- $parts := split $label $accel -}}
+  {{- $head := index $parts 0 -}}
+  {{- $tail := strings.TrimPrefix (printf "%s%s" $head $accel) $label -}}
+  {{- $head }}<span class="accel">{{ $accel }}</span>{{ $tail -}}
+{{- else -}}
+  {{- $label -}}
+{{- end -}}

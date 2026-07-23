@@ -1,0 +1,35 @@
+{{- /*
+  Menu bar. Two modes, set with params.menuStyle:
+
+    "ida"     (default) — literal IDA labels (File / Jump / View / …) mapped
+                          onto real destinations. Each link carries an
+                          aria-label naming the real destination, so screen
+                          reader users hear "Home", not "File". Obvious
+                          navigation is carried by the tab strip below.
+    "literal"           — the site's own nav words (Home, Posts, …) dressed
+                          as XP menus.
+
+  Both modes are real links: navigation works with JS disabled.
+*/ -}}
+{{ $style := site.Params.menuStyle | default "ida" }}
+<nav class="menubar" aria-label="Main">
+  {{ if eq $style "ida" }}
+    {{ $items := site.Params.idaMenu | default (slice
+      (dict "label" "File"    "accel" "F" "name" "Home"       "url" "/")
+      (dict "label" "Jump"    "accel" "J" "name" "Search"     "url" "/search/" "search" true)
+      (dict "label" "View"    "accel" "V" "name" "All posts"  "url" "/posts/")
+      (dict "label" "Windows" "accel" "W" "name" "Tags"       "url" "/tags/")
+      (dict "label" "Help"    "accel" "H" "name" "About"      "url" "/about/")) }}
+    {{ range $items }}
+      <a class="menubar__item" href="{{ partial "func/url.html" .url }}" aria-label="{{ .name }}"
+         {{ if .search }}data-search-open{{ end }}>{{ partial "accel.html" (dict "label" .label "accel" .accel) }}</a>
+    {{ end }}
+  {{ else }}
+    {{ range site.Menus.main }}
+      <a class="menubar__item" href="{{ .URL }}"
+         {{ if $.IsMenuCurrent "main" . }}aria-current="page"{{ end }}>
+        {{ partial "accel.html" (dict "label" .Name "accel" (substr .Name 0 1)) }}
+      </a>
+    {{ end }}
+  {{ end }}
+</nav>

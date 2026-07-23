@@ -1,0 +1,7 @@
+{{- /* Section tabs. Plain anchors — tabs.js only adds arrow-key roving focus. */ -}}
+<nav class="tabstrip" aria-label="Sections" data-tabstrip>
+  {{ range site.Menus.main }}
+    {{ $current := or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) }}
+    <a class="tab" href="{{ .URL }}"{{ if $current }} aria-current="page"{{ end }}>{{ .Name }}</a>
+  {{ end }}
+</nav>

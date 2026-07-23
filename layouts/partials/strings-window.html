@@ -1,0 +1,30 @@
+{{- /* Strings window: taxonomy terms as string-table entries.
+       Call with dict (plural "tags", caption "…").
+       Address = synthetic .rdata offset, Length = post count, Type = C. */ -}}
+{{- $plural := .plural | default "tags" -}}
+{{- $tax := index site.Taxonomies $plural -}}
+<table class="listview listview--strings">
+  {{ with .caption }}<caption>{{ . }}</caption>{{ end }}
+  <thead>
+    <tr>
+      <th scope="col">Address</th>
+      <th scope="col">Length</th>
+      <th scope="col">Type</th>
+      <th scope="col">String</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ $i := 0 }}
+    {{ range $name, $wp := $tax }}
+      {{ $i = add $i 1 }}
+      <tr>
+        <td class="cell--addr">.rdata:{{ printf "%08X" (add 4325376 (mul $i 24)) }}</td>
+        <td class="cell--len">{{ len $wp }}</td>
+        <td class="cell--type">C</td>
+        <td><a href="{{ partial "func/url.html" (printf "/%s/%s/" $plural (urlize $name)) }}">{{ $name }}</a></td>
+      </tr>
+    {{ else }}
+      <tr><td colspan="4" class="cell--type">; no strings in database</td></tr>
+    {{ end }}
+  </tbody>
+</table>

@@ -1,0 +1,42 @@
+{{ define "mdi-class" }}mdi--dialog{{ end }}
+{{ define "main" }}
+{{- /* Popup layout, modelled on IDA's About box: logo panel on the left,
+       product line and prose on the right, one OK button that closes back to
+       the entry point. Opt in with `layout: dialog` in front matter. */ -}}
+<div class="dialog dialog--about" role="dialog" aria-labelledby="dlg-title" aria-modal="false">
+  {{ partial "titlebar.html" (dict
+      "caption" (printf "About %s" site.Title)
+      "small" true
+      "close" true) }}
+
+  <div class="dialog__body dialog__body--about">
+    <div class="about__logo" aria-hidden="true">
+      <svg viewBox="0 0 64 64" role="img" focusable="false">
+        <rect x="1" y="1" width="62" height="62" rx="3" fill="var(--content-bg)" stroke="var(--face-dk)"/>
+        <rect x="1" y="1" width="62" height="12" rx="3" fill="var(--title-1)"/>
+        <g stroke="var(--code-addr)" stroke-width="2">
+          <path d="M7 22h14M7 30h10M7 38h14M7 46h8"/>
+        </g>
+        <g stroke="var(--code-label)" stroke-width="2">
+          <path d="M27 22h30M27 30h24M27 38h30M27 46h18"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="about__text">
+      <h1 id="dlg-title">{{ .Title }}</h1>
+      <p class="about__version">
+        {{ site.Title }} — database of {{ len (where site.RegularPages "Kind" "page") }} functions<br>
+        Built with Hugo {{ hugo.Version }} and the <code>disasm</code> theme
+      </p>
+      <div class="about__content">
+        {{ .Content }}
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog__actions">
+    <a class="btn" href="{{ partial "func/url.html" "/" }}">OK</a>
+  </div>
+</div>
+{{ end }}

@@ -1,0 +1,23 @@
+{{- /* Output window. Lines are rendered server-side; console.js only re-types
+       them, and only when params.console.animate is true. */ -}}
+{{ $n := len (where site.RegularPages "Type" "posts") }}
+{{ $defaults := slice
+  (printf "Loading database %q..." site.Title)
+  "Processing... ok"
+  "Autoanalysis subsystem has been initialized."
+  (printf "Building functions list... %d functions found." $n)
+  "Flushing buffers, please wait...ok"
+  "Analysis finished." }}
+{{ $lines := site.Params.console.messages | default $defaults }}
+<section class="win console" aria-label="Output window">
+  <div class="titlebar titlebar--sm titlebar--inactive">
+    <span class="titlebar__text">Output window</span>
+  </div>
+  <div class="console__body win__body" data-console
+       data-animate="{{ if site.Params.console.animate }}true{{ else }}false{{ end }}"
+       tabindex="0" role="log">
+    {{ range $i, $line := $lines }}
+      <p class="console__line{{ if eq (add $i 1) (len $lines) }} console__line--accent{{ end }}">{{ $line }}</p>
+    {{ end }}
+  </div>
+</section>

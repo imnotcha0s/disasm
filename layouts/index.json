@@ -1,0 +1,13 @@
+{{- $items := slice -}}
+{{- range where site.RegularPages "Kind" "page" -}}
+  {{- $seg := .Params.segment | default ".text" -}}
+  {{- $base := partial "func/address.html" . -}}
+  {{- $items = $items | append (dict
+      "title" .Title
+      "url" .RelPermalink
+      "summary" (.Params.summary | default .Summary | plainify)
+      "tags" (.Params.tags | default slice)
+      "type" $seg
+      "address" (printf "%s:%08X" $seg $base)) -}}
+{{- end -}}
+{{- $items | jsonify -}}

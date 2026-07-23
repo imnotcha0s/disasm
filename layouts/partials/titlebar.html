@@ -1,0 +1,32 @@
+{{- /*
+  Title bar.
+  dict:
+    caption   string  — the caption text
+    small     bool    — 20px variant for MDI children
+    inactive  bool    — greyed Luna gradient
+    buttons   bool    — render the minimize / maximize / close cluster
+    icon      string  — sprite icon name (optional)
+  The minimize and maximize buttons stay hidden until windows.js reveals them,
+  so no-JS readers never see a dead control. Close is a plain link to home.
+*/ -}}
+<div class="titlebar{{ if .small }} titlebar--sm{{ end }}{{ if .inactive }} titlebar--inactive{{ end }}">
+  {{ with .icon }}<span class="titlebar__icon">{{ partial "icon.html" . }}</span>{{ end }}
+  <span class="titlebar__text">{{ .caption }}</span>
+  {{ if .close }}
+    {{- /* Dialogs get only the close box — minimise and maximise are
+           meaningless on a modal. */ -}}
+    <span class="titlebar__buttons">
+      <a class="titlebar__btn titlebar__btn--close" href="{{ partial "func/url.html" "/" }}"
+         aria-label="Close" title="Close">&times;</a>
+    </span>
+  {{ else if .buttons }}
+    <span class="titlebar__buttons">
+      <button class="titlebar__btn" type="button" data-win-action="minimize"
+              aria-expanded="true" aria-label="Collapse this window" title="Minimize" hidden>_</button>
+      <button class="titlebar__btn" type="button" data-win-action="maximize"
+              aria-pressed="false" aria-label="Toggle distraction-free width" title="Maximize" hidden>&#9633;</button>
+      <a class="titlebar__btn titlebar__btn--close" href="{{ partial "func/url.html" "/" }}"
+         data-win-action="close" aria-label="Close (go home)" title="Close">&times;</a>
+    </span>
+  {{ end }}
+</div>

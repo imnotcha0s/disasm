@@ -1,0 +1,27 @@
+{{- /*
+  Returns the base address (an int) for a page's disassembly gutter.
+  Uses the explicit `address` front-matter field when present, otherwise
+  derives a stable pseudo-address from a hash of the page path, so the
+  numbers are deterministic per post across builds.
+*/ -}}
+{{- $hex := dict "0" 0 "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9
+                 "A" 10 "B" 11 "C" 12 "D" 13 "E" 14 "F" 15 -}}
+{{- $base := 0 -}}
+{{- with .Params.address -}}
+  {{- $s := upper (printf "%v" .) -}}
+  {{- $s = strings.TrimPrefix "0X" $s -}}
+  {{- $n := 0 -}}
+  {{- range $c := split $s "" -}}
+    {{- if isset $hex $c -}}
+      {{- $n = add (mul $n 16) (index $hex $c) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $base = $n -}}
+{{- else -}}
+  {{- $key := .RelPermalink | default .Title -}}
+  {{- $h := hash.FNV32a $key -}}
+  {{- if lt $h 0 }}{{ $h = mul $h -1 }}{{ end -}}
+  {{- /* 0x00401000 .. 0x0042FFF0, 16-byte aligned */ -}}
+  {{- $base = add 4198400 (mul (mod $h 12288) 16) -}}
+{{- end -}}
+{{- return $base -}}

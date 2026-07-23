@@ -1,0 +1,11 @@
+{{- /* Latest post teaser for the home window. Receives a page or false. */ -}}
+{{- with . -}}
+  {{- $seg := .Params.segment | default ".text" -}}
+  {{- $base := partial "func/address.html" . -}}
+<h2 data-addr="{{ printf "%s:%08X" $seg $base }}" data-arrow="┌─">
+  <span class="label-glyph" aria-hidden="true">sub_{{ printf "%06X" $base }}:</span>
+  <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+</h2>
+<p>{{ .Params.summary | default .Summary | plainify | truncate 260 }}</p>
+<p><a href="{{ .RelPermalink }}">Read the full chunk →</a></p>
+{{- end -}}

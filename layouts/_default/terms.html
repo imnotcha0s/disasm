@@ -1,0 +1,10 @@
+{{ define "main" }}
+  {{ partial "window.html" (dict
+      "caption" (printf "Strings window    %s" .Title)
+      "class" "win--strings"
+      "label" .Title
+      "buttons" true
+      "body" (partial "strings-window.html" (dict
+                "plural" .Data.Plural
+                "caption" (printf "%d strings in database" (len .Data.Terms))))) }}
+{{ end }}

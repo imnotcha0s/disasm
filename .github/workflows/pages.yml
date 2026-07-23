@@ -1,0 +1,65 @@
+# Publishes exampleSite/ to GitHub Pages as the theme's demo.
+# Repo → Settings → Pages → Source must be set to "GitHub Actions".
+#
+# The demo finds the theme via `themesDir = "../.."` in exampleSite/hugo.toml,
+# which resolves to the checkout's parent directory. GitHub checks out to
+# .../<repo>/<repo>, so this works as long as the repo is named `disasm` —
+# the same assumption that makes `hugo server -s exampleSite` work locally.
+name: Deploy demo to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish; queue at most one more.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.164.0
+    steps:
+      - name: Install Hugo (extended — the theme requires it)
+        run: |
+          curl -sSL -o hugo.deb \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i hugo.deb
+
+      - uses: actions/checkout@v4
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      # base_url carries the /disasm subpath; every internal link is built
+      # from it, so the demo works from a project-page subdirectory.
+      - name: Build
+        run: |
+          hugo --source exampleSite --gc --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: exampleSite/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

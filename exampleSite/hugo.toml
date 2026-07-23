@@ -1,0 +1,77 @@
+baseURL      = "https://example.org/"
+locale       = "en-us"
+title        = "cha0s.re"
+theme        = "disasm"
+themesDir    = "../themes"
+enableRobotsTXT = true
+
+[pagination]
+  pagerSize = 10
+
+[outputs]
+  home = ["html", "rss", "json"]
+
+[taxonomies]
+  tag      = "tags"
+  category = "categories"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel   = 3
+  [markup.highlight]
+    noClasses          = false
+    lineNos            = true
+    lineNumbersInTable = true
+    tabWidth           = 4
+
+[params]
+  author       = "Cha0s"
+  description  = "Notes on reverse engineering, Windows internals, and the tools in between."
+  desktopColor = "teal"      # blue | teal | luna
+  menuStyle    = "ida"       # ida | literal
+  retroFont    = false
+  sourceURL    = "https://example.org/source"
+  cpu          = "x86"
+  diskGag      = "19GB"
+
+  [params.console]
+    animate = true
+    # messages = ["…"]   # defaults are generated from the post count
+
+  [params.postSort]
+    groupByCategory = true
+    categoryOrder   = ["reversing", "windows", "notes"]
+    within          = "date"
+    dir             = "desc"
+    unassignedLabel = "unassigned"
+
+  [params.loadingScreen]
+    enabled  = true
+    style    = "analysis"   # analysis | boot
+    duration = 1200
+    once     = true
+
+[menus]
+  [[menus.main]]
+    name = "Home"
+    url  = "/"
+    weight = 10
+  [[menus.main]]
+    name = "Posts"
+    url  = "/posts/"
+    weight = 20
+  [[menus.main]]
+    name = "Projects"
+    url  = "/projects/"
+    weight = 30
+  [[menus.main]]
+    name = "Tags"
+    url  = "/tags/"
+    weight = 40
+  [[menus.main]]
+    name = "About"
+    url  = "/about/"
+    weight = 50

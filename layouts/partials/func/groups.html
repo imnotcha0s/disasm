@@ -1,0 +1,65 @@
+{{- /*
+  Groups + sorts pages for the Names window. Pure template logic — no JS.
+
+  Call: {{ $groups := partial "func/groups.html" (dict "pages" $pages) }}
+  Returns a slice of dicts: { label, pages, unassigned }
+
+  Config (params.postSort):
+    groupByCategory  bool     — group under category "segments"
+    categoryOrder    []string — explicit group order; unlisted categories fall
+                                to the end, alphabetically
+    within           string   — date | title | weight   (sort inside a group)
+    dir              string   — asc | desc
+    unassignedLabel  string   — label for posts with no category
+*/ -}}
+{{- $cfg := site.Params.postSort | default dict -}}
+{{- $within := $cfg.within | default "date" -}}
+{{- $dir := $cfg.dir | default "desc" -}}
+{{- $key := cond (eq $within "title") "Title" (cond (eq $within "weight") "Weight" "Date") -}}
+{{- $unassigned := $cfg.unassignedLabel | default "unassigned" -}}
+
+{{- $sorted := sort .pages $key $dir -}}
+{{- $out := slice -}}
+
+{{- if $cfg.groupByCategory -}}
+  {{- /* bucket by the `category` param */ -}}
+  {{- $buckets := dict -}}
+  {{- $loose := slice -}}
+  {{- range $sorted -}}
+    {{- /* `category` (string) wins; otherwise the first `categories` entry. */ -}}
+    {{- $c := .Params.category | default "" -}}
+    {{- if not $c }}{{ with .Params.categories }}{{ $c = index . 0 }}{{ end }}{{ end -}}
+    {{- if $c -}}
+      {{- $have := index $buckets $c | default slice -}}
+      {{- $buckets = merge $buckets (dict $c ($have | append .)) -}}
+    {{- else -}}
+      {{- $loose = $loose | append . -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $names := slice -}}
+  {{- range $k, $_ := $buckets }}{{ $names = $names | append $k }}{{ end -}}
+  {{- $names = sort $names -}}
+
+  {{- $order := $cfg.categoryOrder | default slice -}}
+  {{- $used := slice -}}
+  {{- range $order -}}
+    {{- $c := . -}}
+    {{- if isset $buckets $c -}}
+      {{- $out = $out | append (dict "label" $c "pages" (index $buckets $c) "unassigned" false) -}}
+      {{- $used = $used | append $c -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range $names -}}
+    {{- if not (in $used .) -}}
+      {{- $out = $out | append (dict "label" . "pages" (index $buckets .) "unassigned" false) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $loose -}}
+    {{- $out = $out | append (dict "label" $unassigned "pages" $loose "unassigned" true) -}}
+  {{- end -}}
+{{- else -}}
+  {{- $out = $out | append (dict "label" "" "pages" $sorted "unassigned" false) -}}
+{{- end -}}
+
+{{- return $out -}}

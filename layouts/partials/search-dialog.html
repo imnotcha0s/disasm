@@ -1,0 +1,18 @@
+{{- /* "Jump to address" dialog. Hidden until search.js opens it; the toolbar
+       trigger is a plain link to /search/ when JS is unavailable. */ -}}
+<div class="search-dialog" data-search-dialog hidden role="dialog" aria-modal="true"
+     aria-label="Jump to address">
+  <div class="dialog">
+    {{ partial "titlebar.html" (dict "caption" "Jump to address" "small" true) }}
+    <form class="search-form" role="search" action="{{ partial "func/url.html" "/search/" }}" method="get">
+      <label for="jump-q">Address:</label>
+      <input class="field" type="search" id="jump-q" name="q" autocomplete="off" spellcheck="false"
+             placeholder="function name, tag, or keyword">
+    </form>
+    <p class="loading__hint" data-search-status role="status" aria-live="polite"></p>
+    <div class="search-results" data-search-results></div>
+    <div class="dialog__actions">
+      <button class="btn" type="button" data-search-close>Cancel</button>
+    </div>
+  </div>
+</div>

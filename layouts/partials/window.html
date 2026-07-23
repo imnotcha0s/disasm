@@ -1,0 +1,21 @@
+{{- /*
+  Reusable MDI child window.
+  dict:
+    caption    string        — title bar text
+    body       template.HTML — pre-rendered window contents
+    class      string        — extra classes, e.g. "win--names"
+    label      string        — accessible name (defaults to caption)
+    icon       string        — sprite icon name
+    buttons    bool          — show the window button cluster
+    draggable  bool          — allow pointer-dragging on desktop (JS only)
+    face       bool          — use the grey control face for the body
+
+  Always a <section>: html/template escapes dynamic element names, and one
+  landmark element per window is the right semantics anyway.
+*/ -}}
+<section class="win {{ .class }}" data-window
+   {{ if .draggable }}data-draggable="true"{{ end }}
+   aria-label="{{ .label | default .caption }}">
+  {{ partial "titlebar.html" (dict "caption" .caption "small" true "icon" .icon "buttons" .buttons) }}
+  <div class="win__body{{ if .face }} win__body--face{{ end }}">{{ .body }}</div>
+</section>

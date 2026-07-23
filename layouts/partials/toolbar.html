@@ -1,0 +1,30 @@
+{{- /* One dense row of 16×16 buttons. Every button is a real link, or a
+       progressively-enhanced control that stays hidden until its script runs.
+       On narrow screens the row scrolls horizontally (scrollbar suppressed). */ -}}
+<div class="toolbars">
+  <div class="toolbar" role="toolbar" aria-label="Tools">
+    <a class="tbtn" href="{{ partial "func/url.html" "/" }}" title="Home" aria-label="Home">{{ partial "icon.html" "home" }}</a>
+    <a class="tbtn" href="{{ partial "func/url.html" "/posts/" }}" title="All posts" aria-label="All posts">{{ partial "icon.html" "open" }}</a>
+    <a class="tbtn" href="{{ partial "func/url.html" "/tags/" }}" title="Tags" aria-label="Tags">{{ partial "icon.html" "tag" }}</a>
+    <span class="toolbar__sep" aria-hidden="true"></span>
+    <a class="tbtn" href="{{ partial "func/url.html" "/search/" }}" title="Jump to address (search)" aria-label="Search" data-search-open>{{ partial "icon.html" "search" }}</a>
+    {{ with site.Home.OutputFormats.Get "rss" }}
+      <a class="tbtn" href="{{ .RelPermalink }}" title="RSS feed" aria-label="RSS feed">{{ partial "icon.html" "rss" }}</a>
+    {{ end }}
+    <span class="toolbar__sep" aria-hidden="true"></span>
+    <a class="tbtn" href="{{ partial "func/url.html" "/projects/" }}" title="Projects" aria-label="Projects">{{ partial "icon.html" "graph" }}</a>
+    <a class="tbtn" href="{{ partial "func/url.html" "/about/" }}" title="About" aria-label="About">{{ partial "icon.html" "help" }}</a>
+    {{ with site.Params.sourceURL }}
+      <a class="tbtn" href="{{ . }}" title="Source repository" aria-label="Source repository"
+         rel="noopener">{{ partial "icon.html" "source" }}</a>
+    {{ end }}
+    {{ with site.Params.github }}
+      <a class="tbtn" href="{{ . }}" title="GitHub" aria-label="GitHub" rel="me noopener">{{ partial "icon.html" "source" }}</a>
+    {{ end }}
+    <span class="toolbar__sep" aria-hidden="true"></span>
+    <button class="tbtn" type="button" data-theme-toggle aria-pressed="false" hidden
+            title="Toggle debugger (dark) view" aria-label="Toggle debugger (dark) view">{{ partial "icon.html" "theme" }}</button>
+    <span class="toolbar__sep" aria-hidden="true"></span>
+    <span class="tbtn tbtn--text" aria-hidden="true">{{ site.Params.cpu | default "x86" }}</span>
+  </div>
+</div>

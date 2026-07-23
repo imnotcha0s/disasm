@@ -1,0 +1,6 @@
+{{- /* Usage: {{ partial "icon.html" "search" }}
+       The width/height attributes are load-bearing: an <svg> with no
+       intrinsic size falls back to the CSS replaced-element default of
+       300×150 and paints straight through the surrounding chrome. */ -}}
+<svg class="icon" width="16" height="16" viewBox="0 0 16 16"
+     aria-hidden="true" focusable="false"><use href="#i-{{ . }}"></use></svg>

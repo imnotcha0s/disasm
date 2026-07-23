@@ -1,0 +1,134 @@
+/* disasm — Chroma → IDA palette (§6 mapping).
+   Every fenced code block reads as a disassembly listing, whatever the language. */
+
+.view .highlight {
+  margin: 0 0 1.3em;
+  background: var(--content-bg);
+  padding: 3px;
+  box-shadow:
+    inset  1px  1px 0 var(--face-dk),
+    inset -1px -1px 0 var(--face-hi),
+    inset  2px  2px 0 var(--face-sh),
+    inset -2px -2px 0 var(--face-lt);
+  /* Scrolling lives on Chroma's inner wrapper, not here: an overflow other
+     than visible on this box would clip its own ::before, which carries the
+     block's gutter address. */
+  overflow: visible;
+}
+
+/* Long lines scroll inside the block, never the window or the page. */
+.view .highlight > .chroma { overflow-x: auto; }
+
+/* Offset the code block by the gutter instead of padding it: padding would
+   keep the bevelled box full width, so it started under the address column
+   and ran to the very edge of the window. Declared here rather than in
+   content.css because this file loads later and owns the .highlight box. */
+.view .disasm > .highlight {
+  padding-left: 3px;
+  margin-left: var(--gutter-w);
+  margin-right: 2ch;
+}
+
+/* The block's own gutter address is positioned against its box, which now
+   starts *after* the gutter — pull it back out, or it prints on top of the
+   code's first line number. It is also nudged down to sit on the block's
+   first code line rather than the box's top edge: the address column pins
+   ::before at top:0, but the first line clears the box padding
+   (.highlight 3px + pre 6px) plus the line's own leading. */
+.view .disasm > .highlight::before {
+  left: calc(-1 * var(--gutter-w));
+  top: 11px;
+}
+
+.view .highlight pre,
+.view pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  overflow-x: auto;
+  padding: 6px 8px;
+  background: var(--content-bg);
+}
+.view pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Line-number table layout (lineNumbersInTable = true) */
+.view .highlight table { border-collapse: collapse; font-size: inherit; }
+.view .highlight table td { border: 0; padding: 0; vertical-align: top; }
+.view .highlight table td:first-child {
+  width: 1%;
+  background: var(--face);
+  border-right: 1px solid var(--face-sh);
+}
+.view .highlight .lntable pre { padding-left: 6px; padding-right: 6px; }
+
+/* Line numbers → addresses in a sunken gutter.
+   Chroma emits the trailing newline inside each .lnt span, so these must stay
+   inline: any display change breaks the one-number-per-line alignment. */
+.view .highlight .lnt,
+.view .highlight .ln {
+  color: var(--code-addr);
+  user-select: none;
+}
+.view .highlight .lntd:first-child { padding-right: .6ch; }
+.view .highlight .lntd:first-child pre { background: var(--face); }
+.view .highlight .hl { background: #fdf6c8; display: block; }
+
+/* --- token mapping ------------------------------------------------- */
+
+/* Keywords, declarations, types → navy labels */
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn,
+.chroma .kp, .chroma .kr, .chroma .kt {
+  color: var(--code-label);
+  font-weight: bold;
+}
+
+/* Function / class / builtin / attribute names → mnemonics */
+.chroma .nf, .chroma .nc, .chroma .nb, .chroma .na,
+.chroma .nd, .chroma .nx, .chroma .fm {
+  color: var(--code-mnemonic);
+}
+
+/* Strings */
+.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .s1, .chroma .s2,
+.chroma .se, .chroma .sh, .chroma .si, .chroma .sx, .chroma .sr, .chroma .ss,
+.chroma .dl, .chroma .sd {
+  color: var(--code-string);
+}
+
+/* Numbers / immediates */
+.chroma .m, .chroma .mi, .chroma .mf, .chroma .mh, .chroma .mo,
+.chroma .mb, .chroma .il {
+  color: var(--code-addr);
+}
+
+/* Comments — upright, never italic (IDA comments aren't slanted) */
+.chroma .c, .chroma .c1, .chroma .cm, .chroma .ch, .chroma .cs,
+.chroma .cp, .chroma .cpf {
+  color: var(--code-comment);
+  font-style: normal;
+}
+
+/* Variables → register-ish reddish brown */
+.chroma .nv, .chroma .vc, .chroma .vg, .chroma .vi, .chroma .vm {
+  color: var(--code-reg);
+}
+
+/* Operators, punctuation, names, default text */
+.chroma .o, .chroma .ow, .chroma .p, .chroma .n, .chroma .nn,
+.chroma .nl, .chroma .py, .chroma .nt {
+  color: var(--ink);
+}
+.chroma .nt { color: var(--code-mnemonic); }
+.chroma .ow { font-weight: bold; }
+
+/* Diff / generic */
+.chroma .gd { color: #a01919; }
+.chroma .gi { color: var(--code-string); }
+.chroma .gh, .chroma .gu { color: var(--code-label); font-weight: bold; }
+.chroma .gs { font-weight: bold; }
+.chroma .ge { font-style: italic; }
+
+/* Errors stay subtle — no red box */
+.chroma .err { color: var(--code-reg); background: none; }

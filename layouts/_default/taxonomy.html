@@ -1,0 +1,37 @@
+{{ define "main" }}
+  {{ $pages := .Paginate .Pages }}
+  {{ $rows := "" }}
+  {{ range $i, $p := $pages.Pages }}
+    {{ $rows = printf `%s<tr>
+        <td class="cell--addr">.rdata:%08X</td>
+        <td class="cell--len">%d</td>
+        <td class="cell--type">%s</td>
+        <td><a href="%s">%s</a></td>
+      </tr>`
+      $rows
+      (add 4325376 (mul (add $i 1) 24))
+      $p.WordCount
+      ($p.Params.segment | default ".text")
+      $p.RelPermalink
+      $p.Title }}
+  {{ end }}
+
+  {{ $table := printf `<table class="listview listview--strings">
+      <caption>%d function%s referencing "%s"</caption>
+      <thead><tr>
+        <th scope="col">Address</th><th scope="col">Length</th>
+        <th scope="col">Type</th><th scope="col">String</th>
+      </tr></thead>
+      <tbody>%s</tbody>
+    </table>`
+    (len .Pages) (cond (eq (len .Pages) 1) "" "s") .Title $rows }}
+
+  {{ $body := printf "%s%s" $table (partial "pagination.html" .) }}
+
+  {{ partial "window.html" (dict
+      "caption" (printf "Strings window    %s" .Title)
+      "class" "win--strings"
+      "label" (printf "Posts tagged %s" .Title)
+      "buttons" true
+      "body" ($body | safeHTML)) }}
+{{ end }}

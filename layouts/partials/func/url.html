@@ -1,0 +1,23 @@
+{{- /*
+  Returns a site-root-relative URL that survives being served from a
+  subdirectory (GitHub project Pages, /my-site/ deployments, …).
+
+  `relURL` only prepends the baseURL's path component when its argument has
+  no leading slash — `"posts/" | relURL` gives /sub/posts/, but
+  `"/posts/" | relURL` gives /posts/, which 404s under a subpath. This trims
+  the slash so call sites can keep writing paths the readable way.
+
+  Single exit: Hugo rejects `return` inside nested conditionals here.
+
+  Usage: {{ partial "func/url.html" "/posts/" }}
+*/ -}}
+{{- $p := strings.TrimPrefix "/" (printf "%v" .) -}}
+{{- $out := "" -}}
+{{- if or (hasPrefix $p "http://") (hasPrefix $p "https://") (hasPrefix $p "//") -}}
+  {{- $out = $p -}}
+{{- else if eq $p "" -}}
+  {{- $out = site.Home.RelPermalink -}}
+{{- else -}}
+  {{- $out = $p | relURL -}}
+{{- end -}}
+{{- return $out -}}

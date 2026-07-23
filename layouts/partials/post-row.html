@@ -1,0 +1,16 @@
+{{- /* One row in the Names window. Dates are shown as 0xYYYYMMDD addresses but
+       wrapped in <time> so the real value stays machine-readable. */ -}}
+<tr>
+  <td class="cell--name">
+    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+    {{ with .Params.summary | default .Summary }}
+      <span class="row-summary">{{ . | plainify | truncate 110 }}</span>
+    {{ end }}
+  </td>
+  <td class="cell--addr">
+    <time datetime="{{ .Date.Format "2006-01-02" }}" title="{{ .Date.Format "2 January 2006" }}">
+      0x{{ .Date.Format "20060102" }}
+    </time>
+  </td>
+  <td class="cell--type">{{ .Params.segment | default ".text" }}</td>
+</tr>

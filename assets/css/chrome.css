@@ -1,0 +1,403 @@
+/* disasm — chrome: desktop, title bars, menu, toolbar, tabs, status bar, scrollbars */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+/* The application window fills the viewport and never scrolls as a page:
+   the chrome (title bar, menus, toolbars, tabs, output window, status bar)
+   stays put and the MDI region scrolls inside it, as a real MDI app does. */
+html { height: 100%; }
+
+body {
+  margin: 0;
+  padding: 10px;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--desk);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--ink);
+}
+
+body.desk--teal   { background: #008080; }
+body.desk--blue   { background: #3a6ea5; }
+body.desk--luna   { background: linear-gradient(#5a97d8, #2c5c96); }
+
+/* Skip link — first stop for keyboard users, hidden until focused. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 6px 10px;
+  background: var(--face);
+  color: var(--ink);
+  font-size: 12px;
+}
+.skip-link:focus { left: 8px; top: 8px; }
+
+/* ------------------------------------------------------------------ *
+ * Bevel utilities — the 2px XP edge, faked with layered inset shadows *
+ * ------------------------------------------------------------------ */
+
+.bevel-out {
+  box-shadow:
+    inset  1px  1px 0 var(--face-hi),
+    inset -1px -1px 0 var(--face-dk),
+    inset  2px  2px 0 var(--face-lt),
+    inset -2px -2px 0 var(--face-sh);
+}
+
+.bevel-in {
+  box-shadow:
+    inset  1px  1px 0 var(--face-dk),
+    inset -1px -1px 0 var(--face-hi),
+    inset  2px  2px 0 var(--face-sh),
+    inset -2px -2px 0 var(--face-lt);
+}
+
+.bevel-thin-in {
+  box-shadow:
+    inset  1px  1px 0 var(--face-sh),
+    inset -1px -1px 0 var(--face-hi);
+}
+
+/* ------------------------------------------------------------------ *
+ * Main application window                                             *
+ * ------------------------------------------------------------------ */
+
+.app {
+  max-width: 1180px;
+  height: 100%;
+  margin: 0 auto;
+  background: var(--face);
+  border: 3px solid var(--frame);
+  border-radius: var(--radius-win);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Chrome rows keep their natural height; only .mdi flexes. */
+.app > .titlebar,
+.app > header,
+.app > .console,
+.app > .statusbar { flex: 0 0 auto; }
+
+/* ------------------------------------------------------------------ *
+ * Title bars                                                          *
+ * ------------------------------------------------------------------ */
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--titlebar-h);
+  padding: 0 3px 0 5px;
+  background: linear-gradient(to bottom,
+              var(--title-1) 0%, var(--title-2) 48%, var(--title-3) 100%);
+  color: var(--title-text);
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .45);
+  border-radius: 5px 5px 0 0;
+  user-select: none;
+}
+
+.app > .titlebar {
+  height: var(--titlebar-h);
+  border-radius: 4px 4px 0 0;
+}
+
+.titlebar--sm { height: 20px; font-size: 11px; }
+
+.titlebar--inactive {
+  background: linear-gradient(to bottom, var(--title-off-1), var(--title-off-2));
+  color: var(--title-off-text);
+}
+
+.titlebar__icon {
+  width: 16px; height: 16px;
+  flex: 0 0 16px;
+  display: block;
+}
+
+.titlebar__text {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titlebar__buttons { display: flex; gap: 2px; flex: 0 0 auto; }
+
+.titlebar__btn {
+  width: 21px; height: 19px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #1c3f94;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #2f6fd0, #12459f);
+  color: #fff;
+  font: bold 11px/1 var(--font-ui);
+  text-shadow: none;
+  cursor: pointer;
+}
+.titlebar__btn:hover { background: linear-gradient(to bottom, #4084dd, #1a56b8); }
+.titlebar__btn--close { background: linear-gradient(to bottom, #d2543a, #a83115); }
+.titlebar__btn--close:hover { background: linear-gradient(to bottom, #e06a4e, #c03d1c); }
+
+/* ------------------------------------------------------------------ *
+ * Menu bar                                                            *
+ * ------------------------------------------------------------------ */
+
+.menubar {
+  display: flex;
+  align-items: center;
+  height: var(--menubar-h);
+  padding: 0 2px;
+  background: var(--face);
+  border-bottom: 1px solid var(--face-sh);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.menubar__item {
+  padding: 3px 8px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.menubar__item:hover,
+.menubar__item:focus { background: var(--sel-bg); color: var(--sel-text); }
+.menubar__item[aria-current="page"] { font-weight: bold; }
+
+.accel { text-decoration: underline; }
+
+/* ------------------------------------------------------------------ *
+ * Toolbars                                                            *
+ * ------------------------------------------------------------------ */
+
+.toolbars {
+  background: var(--face);
+  border-bottom: 1px solid var(--face-sh);
+  padding: 2px 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 4px;
+  min-height: 22px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.toolbar__sep {
+  width: 2px;
+  align-self: stretch;
+  margin: 2px 3px;
+  border-left: 1px solid var(--face-sh);
+  border-right: 1px solid var(--face-hi);
+}
+
+.tbtn {
+  width: 22px; height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.tbtn:hover { border-color: var(--face-hi) var(--face-dk) var(--face-dk) var(--face-hi); background: var(--face-lt); }
+.tbtn:active { border-color: var(--face-dk) var(--face-hi) var(--face-hi) var(--face-dk); }
+/* Safety net for the sprite icons: never let one fall back to the 300×150
+   default replaced-element size. */
+.icon,
+.tbtn svg,
+.titlebar__icon svg { width: 16px; height: 16px; display: block; flex: 0 0 16px; }
+
+.tbtn--text {
+  width: auto;
+  padding: 0 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Tab strip                                                           *
+ * ------------------------------------------------------------------ */
+
+.tabstrip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 3px 6px 0;
+  background: var(--face);
+  border-bottom: 1px solid var(--face-sh);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  padding: 3px 10px 4px;
+  margin-bottom: -1px;
+  background: var(--face);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid var(--face-sh);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset 1px 1px 0 var(--face-hi);
+}
+.tab:hover { background: var(--face-lt); }
+
+.tab[aria-current="page"],
+.tab.is-active {
+  background: var(--content-bg);
+  font-weight: bold;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-color: var(--face-dk);
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * Status bar                                                          *
+ * ------------------------------------------------------------------ */
+
+.statusbar {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  padding: 3px;
+  background: var(--face);
+  border-top: 1px solid var(--face-hi);
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+
+.statusbar__cell {
+  padding: 2px 6px;
+  background: var(--face);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.statusbar__cell--grow { flex: 1 1 auto; min-width: 60px; overflow: hidden; text-overflow: ellipsis; }
+
+/* ------------------------------------------------------------------ *
+ * Console / output window                                             *
+ * ------------------------------------------------------------------ */
+
+.console {
+  margin: 0 6px 6px;
+}
+
+.console__body {
+  height: 92px;
+  overflow-y: auto;
+  padding: 3px 6px;
+  background: var(--console-bg);
+  color: var(--console-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.console__line { white-space: pre-wrap; margin: 0; }
+.console__line--accent { color: var(--console-accent); font-weight: bold; }
+
+/* The chrome strips scroll horizontally on narrow screens but must never
+   show a scrollbar. Hiding ::-webkit-scrollbar alone is not enough: the
+   track / thumb / button parts are separate pseudo-elements and keep
+   painting from the global rules below, which is what produced the stray
+   bar under the tab strip. Every part has to be switched off. */
+.menubar::-webkit-scrollbar,
+.menubar::-webkit-scrollbar-track,
+.menubar::-webkit-scrollbar-thumb,
+.menubar::-webkit-scrollbar-button,
+.menubar::-webkit-scrollbar-corner,
+.toolbar::-webkit-scrollbar,
+.toolbar::-webkit-scrollbar-track,
+.toolbar::-webkit-scrollbar-thumb,
+.toolbar::-webkit-scrollbar-button,
+.toolbar::-webkit-scrollbar-corner,
+.tabstrip::-webkit-scrollbar,
+.tabstrip::-webkit-scrollbar-track,
+.tabstrip::-webkit-scrollbar-thumb,
+.tabstrip::-webkit-scrollbar-button,
+.tabstrip::-webkit-scrollbar-corner {
+  display: none;
+  width: 0;
+  height: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Scrollbars — XP grey 3D                                             *
+ * ------------------------------------------------------------------ */
+
+* { scrollbar-color: var(--face) var(--face-lt); scrollbar-width: auto; }
+
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-track {
+  background-color: var(--face-lt);
+  background-image: repeating-conic-gradient(var(--face-lt) 0% 25%, var(--content-bg) 0% 50%);
+  background-size: 2px 2px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--face);
+  box-shadow:
+    inset  1px  1px 0 var(--face-hi),
+    inset -1px -1px 0 var(--face-dk),
+    inset  2px  2px 0 var(--face-lt),
+    inset -2px -2px 0 var(--face-sh);
+}
+::-webkit-scrollbar-button:single-button {
+  background: var(--face);
+  height: 16px; width: 16px;
+  box-shadow:
+    inset  1px  1px 0 var(--face-hi),
+    inset -1px -1px 0 var(--face-dk),
+    inset  2px  2px 0 var(--face-lt),
+    inset -2px -2px 0 var(--face-sh);
+}
+::-webkit-scrollbar-corner { background: var(--face); }
+
+/* ------------------------------------------------------------------ *
+ * Focus — the dotted XP focus rectangle doubles as the a11y indicator *
+ * ------------------------------------------------------------------ */
+
+:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: 1px;
+}
+.titlebar :focus-visible { outline-color: #fff; }
+.console :focus-visible,
+[data-theme="debugger"] :focus-visible { outline-color: currentColor; }
+
+::selection { background: var(--sel-bg); color: var(--sel-text); }
+
+/* ------------------------------------------------------------------ *
+ * Responsive chrome (≤720px)                                          *
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 720px) {
+  body { padding: 0; }
+  .app { border-width: 0; border-radius: 0; }
+  .app > .titlebar { border-radius: 0; }
+  .statusbar__cell--optional { display: none; }
+}

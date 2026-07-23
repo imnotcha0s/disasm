@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="{{ or site.Language.Locale site.Language.Lang "en" }}"
+      class="{{ if site.Params.retroFont }}retro-font{{ end }}"
+      data-search-index="{{ "index.json" | relURL }}">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body class="desk desk--{{ site.Params.desktopColor | default "blue" }}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  {{ partial "icons.html" . }}
+
+  {{- $path := "" -}}
+  {{- with .File -}}
+    {{- $path = printf "C:\\blog\\content\\%s" (replace .Path "/" "\\") -}}
+  {{- else -}}
+    {{- $path = printf "C:\\blog%s" (replace .RelPermalink "/" "\\") -}}
+  {{- end -}}
+
+  <div class="app">
+    {{ partial "titlebar.html" (dict
+        "caption" (printf "IDA - %s" $path)
+        "buttons" true
+        "icon" "hex") }}
+
+    <header>
+      {{ partial "menubar.html" . }}
+      {{ partial "toolbar.html" . }}
+      {{ partial "tabstrip.html" . }}
+    </header>
+
+    <main id="main" class="mdi {{ block "mdi-class" . }}{{ end }}">
+      {{ block "main" . }}{{ end }}
+    </main>
+
+    {{ partial "console.html" . }}
+    {{ partial "statusbar.html" . }}
+  </div>
+
+  {{ partial "search-dialog.html" . }}
+
+  {{- $ls := site.Params.loadingScreen -}}
+  {{- if and $ls (ne $ls.enabled false) -}}
+    {{- $msgs := $ls.messages | default (site.Params.console.messages | default (slice
+        "Loading database…"
+        "Building functions list…"
+        (printf "Analysis finished, %d functions found." (len (where site.RegularPages "Type" "posts"))))) -}}
+    <script>
+      window.__disasmLoading = {
+        enabled: true,
+        {{- /* No jsonify: html/template already emits correct JS literals in
+               this context, and jsonify here would double-encode them. */ -}}
+        style: {{ $ls.style | default "analysis" }},
+        duration: {{ $ls.duration | default 1200 }},
+        once: {{ ne $ls.once false }},
+        title: {{ site.Title }},
+        messages: {{ $msgs }}
+      };
+    </script>
+  {{- end -}}
+
+  {{ $opts := dict "minify" hugo.IsProduction "target" "es2018" "format" "iife" }}
+  {{ with resources.Get "js/main.js" | js.Build $opts }}
+    {{ if hugo.IsProduction }}{{ $j := . | fingerprint }}
+      <script src="{{ $j.RelPermalink }}" integrity="{{ $j.Data.Integrity }}" defer></script>
+    {{ else }}
+      <script src="{{ .RelPermalink }}" defer></script>
+    {{ end }}
+  {{ end }}
+</body>
+</html>
