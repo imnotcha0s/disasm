@@ -1,0 +1,20 @@
+{{- /*
+  Route every fenced code block through Chroma so highlighted and plain blocks
+  share one structure (.highlight > .chroma > …) and therefore one set of
+  layout rules — the gutter offset, right margin, and inner scroll defined in
+  syntax.css. Without this, a fence with no language rendered as a bare <pre>
+  that skipped all of it and ran off the right edge of the window.
+
+  - With a language: use the site's highlight defaults (line numbers on).
+  - Without a language: same box, but no line numbers — address-style line
+    numbers on shell output or prose-in-a-fence would be noise.
+
+  Indented (4-space) code blocks bypass this hook; syntax.css contains a
+  fallback for bare <pre> so those stay contained too.
+*/ -}}
+{{- $code := trim .Inner "\n" -}}
+{{- if .Type -}}
+  {{- highlight $code .Type "" -}}
+{{- else -}}
+  {{- highlight $code "text" "lineNos=false" -}}
+{{- end -}}

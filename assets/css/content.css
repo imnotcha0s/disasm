@@ -187,19 +187,15 @@
 .table-scroll { margin: 0 0 1.2em; }
 .table-scroll__inner { overflow-x: auto; }
 
-/* Blocks that paint a box (code, tables) must be *offset* by the gutter
-   rather than padded by it — padding keeps the border box full width, which
-   made the code block start under the address column and run to the very
-   edge of the window. The right margin gives it the same breathing room the
-   prose has. */
+/* Offset the table by the gutter with PADDING, not margin — the same reason
+   as code blocks (see syntax.css): margin moved the ::before address right by
+   var(--gutter-w), and the -var(--gutter-w) pull-back never cancelled it
+   because the two `ch` lengths resolve at different font sizes. Padding keeps
+   the wrapper full-width and the address at left:0, aligned with every
+   paragraph address. The inner .table-scroll__inner carries the scroll. */
 .disasm > .table-scroll {
-  padding-left: 0;
-  margin-left: var(--gutter-w);
-  margin-right: 2ch;
-}
-
-.disasm > .table-scroll::before {
-  left: calc(-1 * var(--gutter-w));
+  padding-left: var(--gutter-w);
+  padding-right: 2ch;
 }
 
 .view table {

@@ -2,7 +2,7 @@ baseURL      = "https://example.org/"
 locale       = "en-us"
 title        = "cha0s.re"
 theme        = "disasm"
-themesDir    = "../themes"
+themesDir    = "../.."
 enableRobotsTXT = true
 
 [pagination]

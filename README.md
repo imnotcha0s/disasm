@@ -99,6 +99,18 @@ The **tab strip** is built from `menus.main` and is the primary navigation:
 
 ---
 
+## New posts
+
+The theme ships archetypes, so `hugo new` scaffolds a post with every field
+below already in place (and commented flavour fields you can delete):
+
+```bash
+hugo new posts/my-post.md
+```
+
+The generated post is `draft: true`; drop that line, or build with `hugo -D`,
+to publish it.
+
 ## Front matter
 
 ```toml

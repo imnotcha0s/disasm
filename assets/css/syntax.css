@@ -1,8 +1,17 @@
 /* disasm — Chroma → IDA palette (§6 mapping).
    Every fenced code block reads as a disassembly listing, whatever the language. */
 
+/* The .highlight wrapper is a transparent offsetter — no box of its own, so
+   the address ::before it carries can sit in the clear gutter. */
 .view .highlight {
   margin: 0 0 1.3em;
+  overflow: visible;
+}
+
+/* The sunken bevel box lives on the inner .chroma, which begins after the
+   gutter padding — so the frame wraps only the code, never the address
+   column, and long lines scroll inside it. */
+.view .highlight > .chroma {
   background: var(--content-bg);
   padding: 3px;
   box-shadow:
@@ -10,33 +19,24 @@
     inset -1px -1px 0 var(--face-hi),
     inset  2px  2px 0 var(--face-sh),
     inset -2px -2px 0 var(--face-lt);
-  /* Scrolling lives on Chroma's inner wrapper, not here: an overflow other
-     than visible on this box would clip its own ::before, which carries the
-     block's gutter address. */
-  overflow: visible;
+  overflow-x: auto;
 }
 
-/* Long lines scroll inside the block, never the window or the page. */
-.view .highlight > .chroma { overflow-x: auto; }
-
-/* Offset the code block by the gutter instead of padding it: padding would
-   keep the bevelled box full width, so it started under the address column
-   and ran to the very edge of the window. Declared here rather than in
-   content.css because this file loads later and owns the .highlight box. */
+/* Offset the block by the gutter with PADDING, not margin. Margin moved the
+   whole box — and its ::before address — right by var(--gutter-w), forcing a
+   -var(--gutter-w) pull-back on the address; but the two `ch` values resolve
+   at different font sizes (box 13-16px vs address 12px), so they never
+   cancelled and the address drifted out of alignment. Padding keeps the
+   wrapper full-width and the address ::before at left:0, exactly where every
+   paragraph address sits. */
 .view .disasm > .highlight {
-  padding-left: 3px;
-  margin-left: var(--gutter-w);
-  margin-right: 2ch;
+  padding-left: var(--gutter-w);
+  padding-right: 2ch;
 }
 
-/* The block's own gutter address is positioned against its box, which now
-   starts *after* the gutter — pull it back out, or it prints on top of the
-   code's first line number. It is also nudged down to sit on the block's
-   first code line rather than the box's top edge: the address column pins
-   ::before at top:0, but the first line clears the box padding
-   (.highlight 3px + pre 6px) plus the line's own leading. */
+/* Address stays at the gutter origin (left:0 from the base rule); only nudged
+   down onto the block's first code line, which clears the box + pre padding. */
 .view .disasm > .highlight::before {
-  left: calc(-1 * var(--gutter-w));
   top: 11px;
 }
 
@@ -52,6 +52,20 @@
   background: var(--content-bg);
 }
 .view pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Fallback for a bare <pre> — an indented (4-space) code block, which bypasses
+   the code-block render hook and so never gets the .highlight wrapper. Offset
+   it by the gutter with padding (same reasoning as .highlight: keeps its
+   address at left:0 and aligned) and let it scroll internally. It stays
+   frameless — its background matches the view, so the full-width box shows
+   nothing across the gutter — which is fine for the rare indented block. */
+.view .disasm > pre {
+  padding-left: var(--gutter-w);
+  padding-right: 2ch;
+}
+.view .disasm > pre::before {
+  top: 6px;
+}
 
 /* Line-number table layout (lineNumbersInTable = true) */
 .view .highlight table { border-collapse: collapse; font-size: inherit; }
