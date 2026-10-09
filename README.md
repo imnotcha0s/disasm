@@ -101,15 +101,17 @@ The **tab strip** is built from `menus.main` and is the primary navigation:
 
 ## New posts
 
-The theme ships archetypes, so `hugo new` scaffolds a post with every field
+The theme ships archetypes, so `hugo new` scaffolds content with every field
 below already in place (and commented flavour fields you can delete):
 
 ```bash
 hugo new posts/my-post.md
+hugo new projects/my-tool.md
 ```
 
-The generated post is `draft: true`; drop that line, or build with `hugo -D`,
-to publish it.
+`posts` and `projects` each have their own template; anything else falls back
+to a minimal `default` archetype. The generated file is `draft: true`; drop
+that line, or build with `hugo -D`, to publish it.
 
 ## Front matter
 
