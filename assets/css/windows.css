@@ -52,7 +52,10 @@
   }
   .mdi--post > .win--view  { grid-area: view; min-width: 0; }
   .mdi--post > .win--graph { grid-area: graph; }
-  .mdi--post.is-maximized { grid-template-columns: minmax(0, 1fr); grid-template-areas: "view"; }
+  /* Maximized (JS toggle) and graph-hidden (front matter `graph = false`) both
+     drop the graph column and give the view the full width. */
+  .mdi--post.is-maximized,
+  .mdi--post--nograph { grid-template-columns: minmax(0, 1fr); grid-template-areas: "view"; }
   .mdi--post.is-maximized > .win--graph { display: none; }
 }
 

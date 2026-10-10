@@ -269,3 +269,18 @@
   .disasm > ul, .disasm > ol { padding-left: 2.4ch; }
   .disasm > blockquote { padding-left: 1.4ch; border-left: 3px solid var(--code-comment); }
 }
+
+/* ------------------------------------------------------------------ *
+ * Flat mode — `gutter = false` in a post's front matter               *
+ *                                                                     *
+ * Collapse the side address column and let the prose run full width.  *
+ * display:none on the pseudo-elements wins without a specificity war  *
+ * (nothing else sets `display` on them); placed after the mobile      *
+ * block so it also suppresses the stacked addresses there.            *
+ * ------------------------------------------------------------------ */
+.disasm--flat { --gutter-w: 0ch; max-width: 72ch; }
+.disasm--flat::before,                    /* the vertical rule */
+.disasm--flat > *::before,                /* the side addresses */
+.disasm--flat > [data-arrow]::after {     /* the jump arrows */
+  display: none;
+}

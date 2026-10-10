@@ -8,6 +8,8 @@ summary: ""                 # Names-window row + meta description; keep it one l
 # --- optional flavour fields (safe to delete) ------------------------------
 # segment: ".text"          # gutter segment label; defaults to ".text"
 # address: "0x00401A2F"     # base address for the gutter; auto-derived if unset
+# gutter:  false            # hide the side address column (full-width prose)
+# graph:   false            # hide the Graph overview window on this project
 ---
 
 One line on what this is and the single problem it solves — the Names-window

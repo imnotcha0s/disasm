@@ -124,7 +124,13 @@ summary  = "Shown in the Names window row and the meta description."
 
 segment  = ".text"             # optional — gutter segment name, default ".text"
 address  = "0x00401A2F"        # optional — base address for the gutter
+gutter   = false               # optional — hide the side address column
+graph    = false               # optional — hide the Graph overview window
 ```
+
+`gutter = false` collapses the left address column and lets the prose run the
+full width; `graph = false` drops the Graph overview window on that post and
+gives the content pane the whole area. Both default to shown.
 
 If `address` is omitted, the theme derives a stable pseudo-address from a hash
 of the page path (`0x00401000`–`0x0042FFF0`, 16-byte aligned), so a post's

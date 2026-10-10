@@ -8,7 +8,8 @@ summary: ""                 # Names-window row + meta description; keep it one l
 # --- optional flavour fields (safe to delete) ------------------------------
 # segment: ".text"          # gutter segment label; defaults to ".text"
 # address: "0x00401A2F"     # base address for the gutter; auto-derived if unset
-# toc:     true             # force the Graph-overview / TOC window
+# gutter:  false            # hide the side address column (full-width prose)
+# graph:   false            # hide the Graph overview window on this post
 ---
 
 Open with the point of the piece — the Names-window row shows `summary`, so the

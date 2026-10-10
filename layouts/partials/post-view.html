@@ -20,7 +20,7 @@
     </details>
   {{ end }}
 
-  <div class="disasm" data-segment="{{ $seg }}" data-address="{{ printf "0x%08X" $base }}">
+  <div class="disasm{{ if eq .Params.gutter false }} disasm--flat{{ end }}" data-segment="{{ $seg }}" data-address="{{ printf "0x%08X" $base }}">
     <h1 data-addr="{{ $addr }}" data-arrow="┌─">{{ .Title }}</h1>
     {{ .Content }}
   </div>

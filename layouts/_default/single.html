@@ -1,4 +1,4 @@
-{{ define "mdi-class" }}mdi--post{{ end }}
+{{ define "mdi-class" }}mdi--post{{ if eq .Params.graph false }} mdi--post--nograph{{ end }}{{ end }}
 {{ define "main" }}
   {{ $seg := .Params.segment | default ".text" }}
   {{ $base := partial "func/address.html" . }}
@@ -11,11 +11,15 @@
       "draggable" false
       "body" (partial "post-view.html" .)) }}
 
-  {{ $graph := partial "graph-window-body.html" . }}
-  {{ partial "window.html" (dict
-      "caption" "Graph overview"
-      "class" "win--graph"
-      "label" "Contents"
-      "face" true
-      "body" $graph) }}
+  {{- /* The Graph overview window. Hidden per-post with `graph = false` in the
+         front matter; the layout then gives the view the full width. */ -}}
+  {{ if ne .Params.graph false }}
+    {{ $graph := partial "graph-window-body.html" . }}
+    {{ partial "window.html" (dict
+        "caption" "Graph overview"
+        "class" "win--graph"
+        "label" "Contents"
+        "face" true
+        "body" $graph) }}
+  {{ end }}
 {{ end }}
