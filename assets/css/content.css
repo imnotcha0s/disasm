@@ -284,3 +284,9 @@
 .disasm--flat > [data-arrow]::after {     /* the jump arrows */
   display: none;
 }
+
+/* When the Graph overview is hidden (`graph = false`), the view window takes
+   the full width — so let the prose fill it instead of staying capped at the
+   reading column and leaving a dead gap on the right. The app's own 1180px
+   max-width keeps the line length from getting absurd on ultra-wide screens. */
+.mdi--post--nograph .disasm { max-width: none; }
